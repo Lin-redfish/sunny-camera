@@ -1,0 +1,258 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  background-color: #fff;
+  padding: 30rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.camera-list {
+  padding: 20rpx;
+}
+
+.camera-item {
+  display: flex;
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
+}
+
+.camera-image {
+  width: 240rpx;
+  height: 240rpx;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.camera-image image {
+  width: 100%;
+  height: 100%;
+}
+
+.camera-info {
+  flex: 1;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.camera-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.camera-brand {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.camera-price {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+
+.camera-price .price {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff6b6b;
+}
+
+.camera-price .unit {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 4rpx;
+}
+
+.camera-status {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.status-available {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.status-rented {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+
+.status-maintenance {
+  background-color: #ffebee;
+  color: #f44336;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  width: 90%;
+  max-width: 600rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.detail-item {
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: flex-start;
+}
+
+.detail-item .label {
+  font-size: 28rpx;
+  color: #666;
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.detail-item .value {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+.price-highlight {
+  color: #ff6b6b;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.picker {
+  height: 80rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  color: #333;
+}
+
+.total-price {
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff6b6b;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #eee;
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  height: 88rpx;
+  border: none;
+  border-radius: 0;
+  font-size: 32rpx;
+  line-height: 88rpx;
+}
+
+.btn-cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-confirm {
+  background-color: #07c160;
+  color: #fff;
+}
+
+.btn-confirm[disabled] {
+  background-color: #ccc;
+}

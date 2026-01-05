@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="header">
+    <text class="title">相机租赁</text>
+  </view>
+  
+  <view class="camera-list">
+    <block wx:for="{{cameras}}" wx:key="id">
+      <view class="camera-item" bindtap="showCameraDetail" data-camera="{{item}}">
+        <view class="camera-image">
+          <image src="{{item.image_url || '/assets/camera-placeholder.png'}}" mode="aspectFill"></image>
+        </view>
+        <view class="camera-info">
+          <text class="camera-name">{{item.name}}</text>
+          <text class="camera-brand">{{item.brand}} {{item.model}}</text>
+          <view class="camera-price">
+            <text class="price">¥{{item.price}}</text>
+            <text class="unit">/天</text>
+          </view>
+          <view class="camera-status status-{{item.status}}">
+            <text>{{item.status === 'available' ? '可租赁' : item.status === 'rented' ? '已租出' : '维护中'}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && cameras.length === 0}}">
+    <text>暂无相机数据</text>
+  </view>
+</view>
+
+<view class="modal" wx:if="{{showDetailModal}}" catchtap="closeModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">租赁相机</text>
+      <text class="close-btn" bindtap="closeModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="detail-item">
+        <text class="label">相机名称：</text>
+        <text class="value">{{selectedCamera.name}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">品牌型号：</text>
+        <text class="value">{{selectedCamera.brand}} {{selectedCamera.model}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">价格：</text>
+        <text class="value price-highlight">¥{{selectedCamera.price}}/天</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">描述：</text>
+        <text class="value">{{selectedCamera.description}}</text>
+      </view>
+      <view class="form-group">
+        <text class="form-label">姓名：</text>
+        <input class="form-input" placeholder="请输入姓名" bindinput="onNameInput" value="{{userName}}"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">电话：</text>
+        <input class="form-input" type="number" placeholder="请输入电话" bindinput="onPhoneInput" value="{{userPhone}}"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">开始日期：</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker">{{startDate || '请选择开始日期'}}</view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">结束日期：</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="picker">{{endDate || '请选择结束日期'}}</view>
+        </picker>
+      </view>
+      <view class="total-price" wx:if="{{totalPrice > 0}}">
+        <text>总价：¥{{totalPrice}}</text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-cancel" bindtap="closeModal">取消</button>
+      <button class="btn-confirm" bindtap="confirmRent" disabled="{{renting}}">确认租赁</button>
+    </view>
+  </view>
+</view>
