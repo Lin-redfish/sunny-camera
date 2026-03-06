@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="logo">
+    <image src="../../images/camera.png" mode="aspectFit"></image>
+    <text class="title">相机预约系统</text>
+  </view>
+  
+  <view class="form">
+    <view class="form-group">
+      <label>微信昵称</label>
+      <input type="text" placeholder="请输入微信昵称" bindinput="bindNicknameInput"></input>
+    </view>
+    
+    <view class="form-group">
+      <label>头像URL</label>
+      <input type="text" placeholder="请输入头像URL" bindinput="bindAvatarInput"></input>
+    </view>
+    
+    <view class="form-group">
+      <label>OpenID</label>
+      <input type="text" placeholder="请输入OpenID" bindinput="bindOpenidInput"></input>
+    </view>
+    
+    <button class="login-btn" bindtap="login">登录</button>
+  </view>
+  
+  <view class="tip">
+    <text>测试账号：任意OpenID即可</text>
+  </view>
+</view>

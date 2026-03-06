@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相机预约系统测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .status-label {
+            font-weight: bold;
+        }
+
+        .status-value {
+            color: #333;
+        }
+
+        .api-test {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .api-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .api-button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success {
+            color: #155724;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .camera-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 4px;
+        }
+
+        .camera-list {
+            margin-top: 15px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .camera-item {
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .camera-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .camera-brand {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .camera-price {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .camera-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .camera-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-available {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-rented {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">相机预约系统测试</h1>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">当前域名：</span>
+                <span class="status-value">https://sunnycamera.online</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">后端状态：</span>
+                <span class="status-value" id="backend-status">检测中...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">API接口：</span>
+                <span class="status-value" id="api-status">检测中...</span>
+            </div>
+        </div>
+
+        <div class="api-test">
+            <button class="api-button" onclick="testBackend()">测试后端服务</button>
+            <button class="api-button" onclick="testAPI()">测试API接口</button>
+        </div>
+
+        <div class="result" id="test-result" style="display: none;">
+            <div id="result-content"></div>
+        </div>
+
+        <div class="camera-section">
+            <h2>📷 数据库相机列表</h2>
+            <button class="api-button" onclick="loadCameras()">加载相机列表</button>
+            <div id="camera-list" class="camera-list">
+                <div class="loading">点击上方按钮加载相机列表</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 当前配置的域名
+        const currentDomain = 'https://sunnycamera.online';
+
+        // 测试后端服务
+        async function testBackend() {
+            const statusElement = document.getElementById('backend-status');
+            statusElement.textContent = '检测中...';
+
+            try {
+                const response = await fetch(currentDomain);
+                const data = await response.json();
+
+                if (data.message && data.message.includes('相机预约API服务')) {
+                    statusElement.textContent = '✅ 正常运行';
+                    statusElement.style.color = '#155724';
+                } else {
+                    statusElement.textContent = '❌ 运行异常';
+                    statusElement.style.color = '#dc3545';
+                }
+            } catch (error) {
+                statusElement.textContent = '❌ 连接失败';
+                statusElement.style.color = '#dc3545';
+            }
+        }
+
+        // 测试API接口
+        async function testAPI() {
+            const statusElement = document.getElementById('api-status');
+            const resultElement = document.getElementById('test-result');
+            const resultContent = document.getElementById('result-content');
+
+            statusElement.textContent = '检测中...';
+            resultElement.style.display = 'block';
+            resultContent.textContent = '正在测试...';
+
+            try {
+                const response = await fetch(currentDomain + '/api/cameras');
+                const data = await response.json();
+
+                if (data.success && Array.isArray(data.data)) {
+                    statusElement.textContent = '✅ 正常工作';
+                    statusElement.style.color = '#155724';
+                    resultContent.textContent = `✅ API接口正常，共获取到 ${data.data.length} 台相机`;
+                    resultContent.style.color = '#155724';
+                } else {
+                    statusElement.textContent = '❌ 接口异常';
+                    statusElement.style.color = '#dc3545';
+                    resultContent.textContent = `❌ API接口异常：${data.message || '未知错误'}`;
+                    resultContent.style.color = '#dc3545';
+                }
+            } catch (error) {
+                statusElement.textContent = '❌ 连接失败';
+                statusElement.style.color = '#dc3545';
+                resultContent.textContent = `❌ 连接失败：${error.message}`;
+                resultContent.style.color = '#dc3545';
+            }
+        }
+
+        // 加载相机列表
+        async function loadCameras() {
+            const cameraListElement = document.getElementById('camera-list');
+            cameraListElement.innerHTML = '<div class="loading">正在加载相机列表...</div>';
+
+            try {
+                const response = await fetch(currentDomain + '/api/cameras');
+                const data = await response.json();
+
+                if (data.success && Array.isArray(data.data)) {
+                    if (data.data.length === 0) {
+                        cameraListElement.innerHTML = '<div class="loading">数据库中没有相机数据</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    data.data.forEach(camera => {
+                        const statusClass = camera.status === 'available' ? 'status-available' : 'status-rented';
+                        const statusText = camera.status === 'available' ? '可预约' : '已预约';
+
+                        html += `
+                            <div class="camera-item">
+                                <div class="camera-name">${camera.name}</div>
+                                <div class="camera-brand">品牌：${camera.brand} | 型号：${camera.model}</div>
+                                <div class="camera-price">价格：¥${camera.price}/天</div>
+                                <div class="camera-description">${camera.description}</div>
+                                <div class="camera-status ${statusClass}">${statusText}</div>
+                            </div>
+                        `;
+                    });
+
+                    cameraListElement.innerHTML = html;
+                } else {
+                    cameraListElement.innerHTML = `<div class="loading" style="color: #dc3545;">加载失败：${data.message || '未知错误'}</div>`;
+                }
+            } catch (error) {
+                cameraListElement.innerHTML = `<div class="loading" style="color: #dc3545;">连接失败：${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

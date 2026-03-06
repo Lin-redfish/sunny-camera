@@ -1,0 +1,79 @@
+.container {
+  padding: 40rpx;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.logo {
+  margin-top: 100rpx;
+  margin-bottom: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: white;
+  padding: 20rpx;
+}
+
+.logo .title {
+  margin-top: 30rpx;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: white;
+}
+
+.form {
+  width: 100%;
+  max-width: 600rpx;
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.3);
+}
+
+.form-group {
+  margin-bottom: 30rpx;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 20rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 25rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-top: 20rpx;
+}
+
+.tip {
+  margin-top: 40rpx;
+  font-size: 24rpx;
+  color: white;
+  text-align: center;
+}

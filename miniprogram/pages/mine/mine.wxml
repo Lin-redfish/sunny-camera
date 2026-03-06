@@ -1,0 +1,51 @@
+<view class="container">
+  <view class="header">
+    <text class="title">个人中心</text>
+  </view>
+  
+  <view class="user-section">
+    <block wx:if="{{userInfo.nickname}}">
+      <view class="user-info">
+        <image src="{{userInfo.avatar || '../../images/default-avatar.png'}}" mode="aspectFit"></image>
+        <view class="user-details">
+          <text class="nickname">{{userInfo.nickname}}</text>
+          <text class="user-id">用户ID: {{userInfo.id || '未知'}}</text>
+        </view>
+      </view>
+      <button class="logout-btn" bindtap="logout">退出登录</button>
+    </block>
+    
+    <block wx:else>
+      <view class="login-tip">
+        <text>请登录以查看个人信息</text>
+      </view>
+      <button class="login-btn" bindtap="gotoLogin">去登录</button>
+    </block>
+  </view>
+  
+  <view class="menu-section">
+    <view class="menu-item">
+      <text class="menu-icon">📋</text>
+      <text class="menu-text">我的预约</text>
+      <text class="menu-arrow">→</text>
+    </view>
+    
+    <view class="menu-item">
+      <text class="menu-icon">🎁</text>
+      <text class="menu-text">优惠券</text>
+      <text class="menu-arrow">→</text>
+    </view>
+    
+    <view class="menu-item">
+      <text class="menu-icon">📞</text>
+      <text class="menu-text">联系客服</text>
+      <text class="menu-arrow">→</text>
+    </view>
+    
+    <view class="menu-item">
+      <text class="menu-icon">⚙️</text>
+      <text class="menu-text">设置</text>
+      <text class="menu-arrow">→</text>
+    </view>
+  </view>
+</view>

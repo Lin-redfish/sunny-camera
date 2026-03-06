@@ -69,7 +69,7 @@ Page({
     const camera = e.currentTarget.dataset.camera
     if (camera.status !== 'available') {
       wx.showToast({
-        title: '该相机不可租赁',
+        title: '该相机不可预约',
         icon: 'none'
       })
       return
@@ -182,20 +182,20 @@ Page({
       success: (res) => {
         if (res.data.success) {
           wx.showToast({
-            title: '租赁成功',
+            title: '预约成功',
             icon: 'success'
           })
           this.closeModal()
           this.loadCameras()
         } else {
           wx.showToast({
-            title: res.data.message || '租赁失败',
+            title: res.data.message || '预约失败',
             icon: 'none'
           })
         }
       },
       fail: (err) => {
-        console.error('租赁失败:', err)
+        console.error('预约失败:', err)
         wx.showToast({
           title: '网络错误',
           icon: 'none'

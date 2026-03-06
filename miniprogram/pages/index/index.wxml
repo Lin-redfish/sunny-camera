@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="header">
+    <view class="user-info">
+      <image src="{{userInfo.avatar}}" mode="aspectFit"></image>
+      <text>{{userInfo.nickname}}</text>
+    </view>
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+  
+  <view class="camera-list">
+    <view class="section-title">
+      <text>可预约相机</text>
+    </view>
+    
+    <view class="cameras">
+      <block wx:for="{{cameras}}" wx:key="id">
+        <view class="camera-item" bindtap="gotoDetail" data-id="{{item.id}}">
+          <image src="{{item.image}}" mode="aspectFit"></image>
+          <view class="camera-info">
+            <text class="camera-name">{{item.name}}</text>
+            <text class="camera-brand">{{item.brand}} {{item.model}}</text>
+            <text class="camera-price">¥{{item.price}}/天</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

@@ -39,11 +39,58 @@ CREATE TABLE IF NOT EXISTS rentals (
 
 -- 插入示例相机数据
 INSERT INTO cameras (name, brand, model, price, description, image_url, status) VALUES
-('Canon EOS R5', 'Canon', 'EOS R5', 300.00, '4500万像素全画幅无反相机，8K视频录制', 'https://example.com/canon-r5.jpg', 'available'),
-('Sony A7 IV', 'Sony', 'A7 IV', 250.00, '3300万像素全画幅微单，4K 60fps视频', 'https://example.com/sony-a7iv.jpg', 'available'),
-('Nikon Z6 II', 'Nikon', 'Z6 II', 200.00, '2450万像素全画幅无反，双卡槽设计', 'https://example.com/nikon-z6ii.jpg', 'available'),
-('Fujifilm X-T4', 'Fujifilm', 'X-T4', 180.00, '2610万像素APS-C画幅，五轴防抖', 'https://example.com/fuji-xt4.jpg', 'available'),
-('Panasonic S5', 'Panasonic', 'S5', 220.00, '2400万像素全画幅，6K视频录制', 'https://example.com/panasonic-s5.jpg', 'available'),
-('Canon EOS R6', 'Canon', 'EOS R6', 280.00, '2000万像素全画幅，高速连拍', 'https://example.com/canon-r6.jpg', 'available'),
-('Sony A7 III', 'Sony', 'A7 III', 200.00, '2420万像素全画幅，高性价比选择', 'https://example.com/sony-a7iii.jpg', 'available'),
-('Nikon Z7 II', 'Nikon', 'Z7 II', 350.00, '4570万像素全画幅，专业级画质', 'https://example.com/nikon-z7ii.jpg', 'available');
+('大疆 Action 6 Pro', 'DJI', 'Action 6 Pro', 150.00, '4K 120fps 运动相机，防水防抖', '/images/dji-action6pro.jpg', 'available'),
+('佳能 CCD 相机', 'Canon', 'CCD', 80.00, '复古 CCD 相机，胶片质感', '/images/canon-ccd.jpg', 'available'),
+('Nikon Z6 II', 'Nikon', 'Z6 II', 200.00, '2450万像素全画幅无反，双卡槽设计', '/images/nikon-z6ii.jpg', 'available');
+
+-- 管理员表
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+    password VARCHAR(255) NOT NULL COMMENT '密码（加密）',
+    name VARCHAR(100) COMMENT '管理员姓名',
+    avatar VARCHAR(255) COMMENT '头像',
+    status ENUM('active', 'inactive') DEFAULT 'active' COMMENT '状态',
+    last_online TIMESTAMP NULL COMMENT '最后在线时间',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
+
+-- 会话表
+CREATE TABLE IF NOT EXISTS conversations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(100) NOT NULL COMMENT '用户ID（微信openid）',
+    user_name VARCHAR(100) COMMENT '用户昵称',
+    user_avatar VARCHAR(255) COMMENT '用户头像',
+    last_message TEXT COMMENT '最后一条消息',
+    last_message_time TIMESTAMP NULL COMMENT '最后消息时间',
+    unread_count INT DEFAULT 0 COMMENT '未读消息数',
+    status ENUM('active', 'closed') DEFAULT 'active' COMMENT '会话状态',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_updated_at (updated_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会话表';
+
+-- 消息表
+CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conversation_id INT NOT NULL COMMENT '会话ID',
+    sender_type ENUM('user', 'admin') NOT NULL COMMENT '发送者类型',
+    sender_name VARCHAR(100) COMMENT '发送者昵称',
+    sender_avatar VARCHAR(255) COMMENT '发送者头像',
+    content TEXT NOT NULL COMMENT '消息内容',
+    message_type ENUM('text', 'image', 'system') DEFAULT 'text' COMMENT '消息类型',
+    is_read BOOLEAN DEFAULT FALSE COMMENT '是否已读',
+    read_time TIMESTAMP NULL COMMENT '已读时间',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+    INDEX idx_conversation_id (conversation_id),
+    INDEX idx_created_at (created_at),
+    INDEX idx_is_read (is_read)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息表';
+
+-- 插入默认管理员数据（密码：admin123）
+INSERT INTO admins (username, password, name, status) VALUES
+('admin', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', '管理员', 'active');

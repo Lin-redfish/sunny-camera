@@ -5,7 +5,7 @@
     "window": {
         "backgroundTextStyle": "light",
         "navigationBarBackgroundColor": "#fff",
-        "navigationBarTitleText": "相机租赁",
+        "navigationBarTitleText": "相机预约",
         "navigationBarTextStyle": "black"
     },
     "style": "v2",

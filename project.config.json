@@ -44,12 +44,14 @@
     "useCompilerPlugins": false
   },
   "compileType": "miniprogram",
-  "libVersion": "3.13.1",
+  "libVersion": "3.14.3",
   "appid": "wxf2d2fa1e26da1c68",
   "projectname": "相机租赁",
+  "miniprogramRoot": "miniprogram/",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
-  }
+  },
+  "srcMiniprogramRoot": "miniprogram/"
 }

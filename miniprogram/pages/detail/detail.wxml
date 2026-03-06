@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="camera-detail">
+    <image src="{{camera.image}}" mode="aspectFit"></image>
+    <view class="camera-info">
+      <text class="camera-name">{{camera.name}}</text>
+      <text class="camera-brand">{{camera.brand}} {{camera.model}}</text>
+      <text class="camera-price">¥{{camera.price}}/天</text>
+      <text class="camera-description">{{camera.description}}</text>
+    </view>
+  </view>
+  
+  <view class="booking-form">
+    <view class="section-title">
+      <text>预约信息</text>
+    </view>
+    
+    <view class="form-group">
+      <label>联系人</label>
+      <input type="text" placeholder="请输入联系人姓名" bindinput="bindUserNameInput"></input>
+    </view>
+    
+    <view class="form-group">
+      <label>联系电话</label>
+      <input type="text" placeholder="请输入联系电话" bindinput="bindUserPhoneInput"></input>
+    </view>
+    
+    <view class="form-group">
+      <label>开始日期</label>
+      <picker mode="date" bindchange="bindStartDateChange">
+        <view class="picker">
+          {{startDate || '请选择开始日期'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="form-group">
+      <label>结束日期</label>
+      <picker mode="date" bindchange="bindEndDateChange">
+        <view class="picker">
+          {{endDate || '请选择结束日期'}}
+        </view>
+      </picker>
+    </view>
+    
+    <button class="book-btn" bindtap="bookCamera">预约相机</button>
+  </view>
+</view>

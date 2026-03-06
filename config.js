@@ -1,3 +1,3 @@
 module.exports = {
-  API_BASE_URL: 'https://11846da9592yf.vicp.fun/api'
+  API_BASE_URL: 'https://online-formats-defense-telecom.trycloudflare.com/api'
 }

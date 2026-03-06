@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相机预约系统 - 管理后台</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 320px;
+            background-color: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .admin-info {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .admin-details h3 {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .admin-details p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .logout-btn {
+            margin-left: auto;
+            background: none;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 15px;
+            background: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .conversation-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .conversation-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .conversation-item.active {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+
+        .conversation-item.unread {
+            background-color: #fff3e0;
+        }
+
+        /* 预约列表样式 */
+        .rental-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .rental-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .rental-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .rental-item.active {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+
+        .rental-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rental-camera {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .rental-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-completed {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .status-cancelled {
+            background-color: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .rental-details {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .rental-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .rental-btn {
+            padding: 5px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rental-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .btn-edit {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-edit:hover {
+            background-color: #e6f7ff;
+        }
+
+        .btn-renew {
+            border-color: #52c41a;
+            color: #52c41a;
+        }
+
+        .btn-renew:hover {
+            background-color: #f6ffed;
+        }
+
+        .btn-cancel {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+
+        .btn-cancel:hover {
+            background-color: #fff2f0;
+        }
+
+        .conversation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .conversation-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .unread-badge {
+            background-color: #ff4d4f;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .conversation-preview {
+            font-size: 13px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 5px;
+        }
+
+        /* 聊天区域 */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+
+        .chat-header h2 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .chat-actions {
+            margin-left: auto;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid #1890ff;
+            color: #1890ff;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .action-btn:hover {
+            background: #1890ff;
+            color: white;
+        }
+
+        .message-list {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fafafa;
+            background-image: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=light%20blue%20abstract%20background%20pattern%2C%20subtle%2C%20professional%20design%2C%20chat%20interface&image_size=landscape_16_9');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .message-item {
+            margin-bottom: 20px;
+            display: flex;
+            max-width: 70%;
+        }
+
+        .message-item.user {
+            align-self: flex-start;
+        }
+
+        .message-item.admin {
+            align-self: flex-end;
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin: 0 10px;
+        }
+
+        .message-item.user .message-avatar {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+        }
+
+        .message-item.admin .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message-item.user .message-content {
+            background-color: #fff;
+            border-top-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-item.admin .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-top-right-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-sender {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #999;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .message-item.admin .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 输入区域 */
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #fff;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .input-container {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .input-wrapper {
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            min-height: 40px;
+        }
+
+        .message-input {
+            width: 100%;
+            border: none;
+            background: none;
+            resize: none;
+            font-size: 14px;
+            line-height: 1.4;
+            outline: none;
+            min-height: 20px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .input-actions {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 44px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 通知 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #52c41a;
+        }
+
+        .notification.error {
+            background-color: #ff4d4f;
+        }
+
+        .notification.info {
+            background-color: #1890ff;
+        }
+
+        /* 预约管理区域样式 */
+        .rental-detail-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        .rental-detail-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>相机预约系统</h2>
+                <p>客服管理中心</p>
+            </div>
+
+            <div class="admin-info">
+                <div class="admin-avatar">管</div>
+                <div class="admin-details">
+                    <h3>管理员</h3>
+                    <p>在线</p>
+                </div>
+                <button class="logout-btn" onclick="logout()">退出</button>
+            </div>
+
+            <!-- 功能导航 -->
+            <div style="padding: 15px; border-bottom: 1px solid #e0e0e0;">
+                <div style="display: flex; gap: 10px;">
+                    <button class="nav-btn" onclick="switchTab('chat')" id="tab-chat">💬 聊天</button>
+                    <button class="nav-btn" onclick="switchTab('rentals')" id="tab-rentals">📋 预约管理</button>
+                </div>
+            </div>
+
+            <div class="conversation-list" id="conversation-list">
+                <!-- 会话列表将通过JavaScript动态生成 -->
+            </div>
+
+            <div class="rental-list" id="rental-list" style="display: none;">
+                <!-- 预约列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 聊天区域 -->
+        <div class="chat-area" id="chat-area">
+            <div class="chat-header">
+                <h2 id="current-user-name">选择一个会话开始聊天</h2>
+                <div class="chat-actions">
+                    <button class="action-btn" onclick="closeConversation()">关闭会话</button>
+                </div>
+            </div>
+
+            <div class="message-list" id="message-list">
+                <div class="empty-state" id="empty-state">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chat%20icon%20with%20empty%20state%2C%20minimal%20design%2C%20blue%20color%20scheme&image_size=square_hd"
+                        alt="">
+                    <h3>欢迎使用客服管理系统</h3>
+                    <p>从左侧选择一个会话开始与用户聊天</p>
+                    <p>您将在这里看到用户的咨询消息</p>
+                </div>
+            </div>
+
+            <div class="input-area" id="input-area" style="display: none;">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea class="message-input" id="message-input" placeholder="输入消息..."
+                            oninput="autoResize(this)" onkeypress="handleEnterKey(event)"></textarea>
+                    </div>
+                </div>
+                <button class="send-btn" id="send-btn" onclick="sendMessage()">发送</button>
+            </div>
+        </div>
+
+        <!-- 预约管理区域 -->
+        <div class="rental-detail-area" id="rental-detail-area" style="display: none;">
+            <div class="chat-header">
+                <h2 id="current-rental-title">预约详情管理</h2>
+                <div class="chat-actions">
+                    <button class="action-btn" onclick="refreshRentals()">刷新</button>
+                </div>
+            </div>
+
+            <div class="rental-detail-content" id="rental-detail-content">
+                <div class="empty-state">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=calendar%20booking%20icon%20with%20empty%20state%2C%20minimal%20design%2C%20blue%20color%20scheme&image_size=square_hd"
+                        alt="">
+                    <h3>选择预约查看详情</h3>
+                    <p>从左侧选择一个预约查看详细信息</p>
+                    <p>您可以修改预约时间或进行续约操作</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预约编辑模态框 -->
+    <div class="modal" id="rental-edit-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>修改预约信息</h3>
+                <button class="close-btn" onclick="closeModal('rental-edit-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-rental-id">
+                <div class="form-group">
+                    <label for="edit-camera-name">相机名称</label>
+                    <input type="text" id="edit-camera-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-name">用户姓名</label>
+                    <input type="text" id="edit-user-name">
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-phone">联系电话</label>
+                    <input type="text" id="edit-user-phone">
+                </div>
+                <div class="form-group">
+                    <label for="edit-start-date">开始日期</label>
+                    <input type="date" id="edit-start-date">
+                </div>
+                <div class="form-group">
+                    <label for="edit-end-date">结束日期</label>
+                    <input type="date" id="edit-end-date">
+                </div>
+                <div class="form-group">
+                    <label for="edit-status">状态</label>
+                    <select id="edit-status">
+                        <option value="active">进行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rental-edit-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveRentalChanges()">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 续约模态框 -->
+    <div class="modal" id="rental-renew-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>续约操作</h3>
+                <button class="close-btn" onclick="closeModal('rental-renew-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="renew-rental-id">
+                <div class="form-group">
+                    <label for="renew-days">续约天数</label>
+                    <input type="number" id="renew-days" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="renew-notes">备注</label>
+                    <textarea id="renew-notes" placeholder="续约备注信息"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rental-renew-modal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmRenewal()">确认续约</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let socket;
+        let currentConversation = null;
+        let conversations = [];
+        let messages = [];
+        let currentRental = null;
+        let rentals = [];
+
+        // 初始化
+        function init() {
+            // 检查登录状态
+            if (!localStorage.getItem('adminLoggedIn')) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // 初始化WebSocket
+            initSocket();
+
+            // 加载会话列表
+            loadConversations();
+        }
+
+        // 初始化WebSocket
+        function initSocket() {
+            socket = io('https://sunnycamera.online', {
+                transports: ['websocket'],
+                reconnection: true
+            });
+
+            socket.on('connect', () => {
+                console.log('WebSocket连接成功');
+                showNotification('WebSocket连接成功', 'success');
+
+                // 管理员连接
+                socket.emit('admin:connect', {
+                    adminId: 'admin_1',
+                    adminName: '管理员'
+                });
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket断开连接');
+                showNotification('WebSocket断开连接', 'error');
+            });
+
+            // 接收消息
+            socket.on('message:receive', (message) => {
+                console.log('收到消息:', message);
+
+                if (currentConversation && message.conversationId === currentConversation.id) {
+                    addMessage(message);
+                }
+
+                // 重新加载会话列表
+                loadConversations();
+
+                // 显示通知
+                if (message.senderType === 'user') {
+                    showNotification(`收到新消息：${message.content}`, 'info');
+                }
+            });
+
+            // 用户上线
+            socket.on('user:online', (data) => {
+                console.log('用户上线:', data);
+                showNotification(`${data.userName} 上线了`, 'info');
+            });
+
+            // 接收预约状态更新
+            socket.on('rental:updated', (data) => {
+                console.log('预约状态更新:', data);
+                showNotification(`预约 ${data.status === 'cancelled' ? '已取消' : data.status === 'completed' ? '已完成' : '已更新'}`, 'info');
+
+                // 重新加载预约列表
+                if (document.getElementById('tab-rentals').classList.contains('active')) {
+                    loadRentals();
+                }
+            });
+
+            // 用户下线
+            socket.on('user:offline', (data) => {
+                console.log('用户下线:', data);
+                showNotification(`${data.userName} 下线了`, 'info');
+            });
+        }
+
+        // 加载会话列表
+        async function loadConversations() {
+            showNotification('正在加载会话列表...', 'info');
+
+            try {
+                // 从真实API获取数据
+                const response = await fetch('https://sunnycamera.online/api/conversations');
+                const data = await response.json();
+
+                if (data.success) {
+                    conversations = data.data;
+                    renderConversations();
+                    showNotification(`成功加载 ${conversations.length} 个会话`, 'success');
+                } else {
+                    showNotification('加载会话列表失败', 'error');
+                    console.error('加载会话列表失败:', data);
+
+                    // 使用模拟数据作为 fallback
+                    const mockConversations = [
+                        {
+                            id: 1,
+                            userId: 'user_1',
+                            userName: '张三',
+                            userAvatar: '',
+                            lastMessage: '我想预约Canon EOS R5',
+                            lastMessageTime: '2026-01-25T10:00:00',
+                            unreadCount: 2,
+                            status: 'active'
+                        },
+                        {
+                            id: 2,
+                            userId: 'user_2',
+                            userName: '李四',
+                            userAvatar: '',
+                            lastMessage: '请问什么时候可以取相机？',
+                            lastMessageTime: '2026-01-25T09:30:00',
+                            unreadCount: 0,
+                            status: 'active'
+                        },
+                        {
+                            id: 3,
+                            userId: 'user_3',
+                            userName: '王五',
+                            userAvatar: '',
+                            lastMessage: '谢谢，已收到相机',
+                            lastMessageTime: '2026-01-24T16:00:00',
+                            unreadCount: 0,
+                            status: 'closed'
+                        }
+                    ];
+
+                    conversations = mockConversations;
+                    renderConversations();
+                }
+            } catch (error) {
+                showNotification('网络错误，请稍后重试', 'error');
+                console.error('加载会话列表网络错误:', error);
+
+                // 使用模拟数据作为 fallback
+                const mockConversations = [
+                    {
+                        id: 1,
+                        userId: 'user_1',
+                        userName: '张三',
+                        userAvatar: '',
+                        lastMessage: '我想预约Canon EOS R5',
+                        lastMessageTime: '2026-01-25T10:00:00',
+                        unreadCount: 2,
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        userId: 'user_2',
+                        userName: '李四',
+                        userAvatar: '',
+                        lastMessage: '请问什么时候可以取相机？',
+                        lastMessageTime: '2026-01-25T09:30:00',
+                        unreadCount: 0,
+                        status: 'active'
+                    },
+                    {
+                        id: 3,
+                        userId: 'user_3',
+                        userName: '王五',
+                        userAvatar: '',
+                        lastMessage: '谢谢，已收到相机',
+                        lastMessageTime: '2026-01-24T16:00:00',
+                        unreadCount: 0,
+                        status: 'closed'
+                    }
+                ];
+
+                conversations = mockConversations;
+                renderConversations();
+            }
+        }
+
+        // 渲染会话列表
+        function renderConversations() {
+            const conversationList = document.getElementById('conversation-list');
+
+            if (conversations.length === 0) {
+                conversationList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <p>暂无会话</p>
+                        <p>用户发起咨询后会显示在这里</p>
+                    </div>
+                `;
+                return;
+            }
+
+            conversationList.innerHTML = conversations.map(conv => {
+                const isActive = currentConversation && currentConversation.id === conv.id;
+                const hasUnread = conv.unreadCount > 0;
+
+                return `
+                    <div 
+                        class="conversation-item ${isActive ? 'active' : ''} ${hasUnread ? 'unread' : ''}"
+                        onclick="selectConversation(${conv.id})"
+                    >
+                        <div class="conversation-header">
+                            <div class="user-avatar">${conv.userName.charAt(0)}</div>
+                            <div class="user-info">
+                                <div class="user-name">${conv.userName}</div>
+                                <div class="conversation-time">${formatTime(conv.lastMessageTime)}</div>
+                            </div>
+                            ${hasUnread ? `<span class="unread-badge">${conv.unreadCount}</span>` : ''}
+                        </div>
+                        <div class="conversation-preview">${conv.lastMessage}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 选择会话
+        function selectConversation(conversationId) {
+            currentConversation = conversations.find(c => c.id === conversationId);
+
+            if (!currentConversation) return;
+
+            // 更新UI
+            document.getElementById('current-user-name').textContent = currentConversation.userName;
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('input-area').style.display = 'flex';
+
+            // 渲染会话列表
+            renderConversations();
+
+            // 加载消息
+            loadMessages();
+        }
+
+        // 加载消息
+        async function loadMessages() {
+            const messageList = document.getElementById('message-list');
+            messageList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">加载消息中...</div>';
+
+            try {
+                // 从真实API获取数据
+                const response = await fetch(`https://sunnycamera.online/api/conversations/${currentConversation.id}/messages`);
+                const data = await response.json();
+
+                if (data.success) {
+                    messages = data.data;
+                    renderMessages();
+                } else {
+                    showNotification('加载消息失败', 'error');
+                    console.error('加载消息失败:', data);
+
+                    // 使用模拟数据作为 fallback
+                    const mockMessages = [
+                        {
+                            id: 1,
+                            conversationId: currentConversation.id,
+                            senderType: 'user',
+                            senderName: currentConversation.userName,
+                            senderAvatar: '',
+                            content: '您好，我想咨询一下Canon EOS R5的预约情况',
+                            messageType: 'text',
+                            isRead: false,
+                            createdAt: '2026-01-25T09:00:00'
+                        },
+                        {
+                            id: 2,
+                            conversationId: currentConversation.id,
+                            senderType: 'admin',
+                            senderName: '管理员',
+                            senderAvatar: '',
+                            content: '您好，Canon EOS R5目前可以预约，请问您需要预约几天？',
+                            messageType: 'text',
+                            isRead: true,
+                            createdAt: '2026-01-25T09:05:00'
+                        },
+                        {
+                            id: 3,
+                            conversationId: currentConversation.id,
+                            senderType: 'user',
+                            senderName: currentConversation.userName,
+                            senderAvatar: '',
+                            content: '我想预约3天，从明天开始',
+                            messageType: 'text',
+                            isRead: false,
+                            createdAt: '2026-01-25T10:00:00'
+                        }
+                    ];
+
+                    messages = mockMessages;
+                    renderMessages();
+                }
+            } catch (error) {
+                showNotification('网络错误，请稍后重试', 'error');
+                console.error('加载消息失败:', error);
+
+                // 使用模拟数据作为 fallback
+                const mockMessages = [
+                    {
+                        id: 1,
+                        conversationId: currentConversation.id,
+                        senderType: 'user',
+                        senderName: currentConversation.userName,
+                        senderAvatar: '',
+                        content: '您好，我想咨询一下Canon EOS R5的预约情况',
+                        messageType: 'text',
+                        isRead: false,
+                        createdAt: '2026-01-25T09:00:00'
+                    },
+                    {
+                        id: 2,
+                        conversationId: currentConversation.id,
+                        senderType: 'admin',
+                        senderName: '管理员',
+                        senderAvatar: '',
+                        content: '您好，Canon EOS R5目前可以预约，请问您需要预约几天？',
+                        messageType: 'text',
+                        isRead: true,
+                        createdAt: '2026-01-25T09:05:00'
+                    },
+                    {
+                        id: 3,
+                        conversationId: currentConversation.id,
+                        senderType: 'user',
+                        senderName: currentConversation.userName,
+                        senderAvatar: '',
+                        content: '我想预约3天，从明天开始',
+                        messageType: 'text',
+                        isRead: false,
+                        createdAt: '2026-01-25T10:00:00'
+                    }
+                ];
+
+                messages = mockMessages;
+                renderMessages();
+            }
+        }
+
+        // 渲染消息
+        function renderMessages() {
+            const messageList = document.getElementById('message-list');
+
+            messageList.innerHTML = messages.map(msg => {
+                const isUser = msg.senderType === 'user';
+
+                return `
+                    <div class="message-item ${msg.senderType}">
+                        <div class="message-avatar">${isUser ? msg.senderName.charAt(0) : '管'}</div>
+                        <div class="message-content">
+                            <div class="message-sender">${msg.senderName}</div>
+                            <div class="message-text">${msg.content}</div>
+                            <div class="message-time">${formatTime(msg.createdAt)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 滚动到底部
+            messageList.scrollTop = messageList.scrollHeight;
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const content = input.value.trim();
+
+            if (!content || !currentConversation) return;
+
+            showNotification('正在发送消息...', 'info');
+
+            // 发送API请求
+            fetch('https://sunnycamera.online/api/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    conversation_id: currentConversation.id,
+                    sender_type: 'admin',
+                    sender_name: '管理员',
+                    content: content,
+                    message_type: 'text'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 添加消息到本地
+                        const newMessage = data.data;
+                        messages.push(newMessage);
+                        renderMessages();
+                        input.value = '';
+                        input.style.height = 'auto';
+
+                        // 显示发送成功通知
+                        showNotification('消息发送成功', 'success');
+
+                        // 发送WebSocket消息
+                        if (socket) {
+                            socket.emit('message:send', newMessage);
+                        }
+                    } else {
+                        showNotification('消息发送失败：' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('网络错误，请稍后重试', 'error');
+                    console.error('发送消息失败:', error);
+                });
+        }
+
+        // 关闭会话
+        function closeConversation() {
+            if (!currentConversation) return;
+
+            if (confirm('确定要关闭这个会话吗？')) {
+                showNotification('正在关闭会话...', 'info');
+
+                // 发送API请求
+                fetch(`https://sunnycamera.online/api/conversations/${currentConversation.id}/close`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 更新本地会话状态
+                            currentConversation.status = 'closed';
+
+                            // 更新UI
+                            document.getElementById('current-user-name').textContent = '选择一个会话开始聊天';
+                            document.getElementById('empty-state').style.display = 'flex';
+                            document.getElementById('input-area').style.display = 'none';
+
+                            currentConversation = null;
+                            renderConversations();
+
+                            showNotification('会话已关闭', 'success');
+                        } else {
+                            showNotification('关闭会话失败：' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('网络错误，请稍后重试', 'error');
+                        console.error('关闭会话失败:', error);
+                    });
+            }
+        }
+
+        // 切换标签
+        function switchTab(tab) {
+            if (tab === 'chat') {
+                // 显示聊天相关元素
+                document.getElementById('tab-chat').classList.add('active');
+                document.getElementById('tab-rentals').classList.remove('active');
+                document.getElementById('conversation-list').style.display = 'block';
+                document.getElementById('rental-list').style.display = 'none';
+                document.getElementById('chat-area').style.display = 'flex';
+                document.getElementById('rental-detail-area').style.display = 'none';
+            } else if (tab === 'rentals') {
+                // 显示预约管理相关元素
+                document.getElementById('tab-chat').classList.remove('active');
+                document.getElementById('tab-rentals').classList.add('active');
+                document.getElementById('conversation-list').style.display = 'none';
+                document.getElementById('rental-list').style.display = 'block';
+                document.getElementById('chat-area').style.display = 'none';
+                document.getElementById('rental-detail-area').style.display = 'flex';
+
+                // 加载预约列表
+                loadRentals();
+            }
+        }
+
+        // 加载预约列表
+        function loadRentals() {
+            showNotification('正在加载预约列表...', 'info');
+
+            // 从真实API获取数据
+            fetch('https://naples-dressing-toolbox-movers.trycloudflare.com/api/admin/rentals')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        rentals = data.data;
+                        renderRentalList();
+                        showNotification(`成功加载 ${rentals.length} 条预约记录`, 'success');
+                    } else {
+                        showNotification('加载预约列表失败', 'error');
+                        console.error('加载预约列表失败:', data);
+                    }
+                })
+                .catch(error => {
+                    showNotification('网络错误，请稍后重试', 'error');
+                    console.error('加载预约列表网络错误:', error);
+
+                    // 使用模拟数据作为 fallback
+                    rentals = [
+                        {
+                            id: 1,
+                            camera_id: 1,
+                            camera_name: 'Canon EOS R5',
+                            user_name: '张三',
+                            user_phone: '13800138000',
+                            start_date: '2026-01-26',
+                            end_date: '2026-01-28',
+                            total_price: 900.00,
+                            status: 'active',
+                            created_at: '2026-01-25 10:00:00'
+                        },
+                        {
+                            id: 2,
+                            camera_id: 2,
+                            camera_name: 'Sony A7 IV',
+                            user_name: '李四',
+                            user_phone: '13900139000',
+                            start_date: '2026-01-27',
+                            end_date: '2026-01-30',
+                            total_price: 1000.00,
+                            status: 'active',
+                            created_at: '2026-01-25 11:00:00'
+                        },
+                        {
+                            id: 3,
+                            camera_id: 3,
+                            camera_name: 'Nikon Z6 II',
+                            user_name: '王五',
+                            user_phone: '13700137000',
+                            start_date: '2026-01-25',
+                            end_date: '2026-01-26',
+                            total_price: 400.00,
+                            status: 'completed',
+                            created_at: '2026-01-24 15:00:00'
+                        }
+                    ];
+                    renderRentalList();
+                });
+        }
+
+        // 渲染预约列表
+        function renderRentalList() {
+            const rentalList = document.getElementById('rental-list');
+            rentalList.innerHTML = '';
+
+            if (rentals.length === 0) {
+                rentalList.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+                        <h3>暂无预约</h3>
+                        <p style="color: #999;">目前没有任何预约记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            rentals.forEach(rental => {
+                const statusClass = rental.status === 'active' ? 'status-active' :
+                    rental.status === 'completed' ? 'status-completed' : 'status-cancelled';
+                const statusText = rental.status === 'active' ? '进行中' :
+                    rental.status === 'completed' ? '已完成' : '已取消';
+
+                const rentalItem = document.createElement('div');
+                rentalItem.className = `rental-item ${currentRental && currentRental.id === rental.id ? 'active' : ''}`;
+                rentalItem.onclick = () => viewRentalDetail(rental);
+
+                rentalItem.innerHTML = `
+                    <div class="rental-header">
+                        <div class="rental-camera">${rental.camera_name}</div>
+                        <div class="rental-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="rental-details">
+                        <p>用户：${rental.user_name}</p>
+                        <p>电话：${rental.user_phone}</p>
+                        <p>时间：${rental.start_date} 至 ${rental.end_date}</p>
+                        <p>价格：¥${rental.total_price.toFixed(2)}</p>
+                    </div>
+                    <div class="rental-actions">
+                        ${rental.status === 'active' ? `
+                            <button class="rental-btn btn-edit" onclick="event.stopPropagation(); editRental(${rental.id})">修改</button>
+                            <button class="rental-btn btn-renew" onclick="event.stopPropagation(); renewRental(${rental.id})">续约</button>
+                            <button class="rental-btn btn-cancel" onclick="event.stopPropagation(); cancelRental(${rental.id})">取消</button>
+                        ` : `
+                            <button class="rental-btn btn-edit" onclick="event.stopPropagation(); editRental(${rental.id})">修改</button>
+                        `}
+                    </div>
+                `;
+
+                rentalList.appendChild(rentalItem);
+            });
+        }
+
+        // 查看预约详情
+        function viewRentalDetail(rental) {
+            currentRental = rental;
+            renderRentalList();
+
+            const detailContent = document.getElementById('rental-detail-content');
+            const statusClass = rental.status === 'active' ? 'status-active' :
+                rental.status === 'completed' ? 'status-completed' : 'status-cancelled';
+            const statusText = rental.status === 'active' ? '进行中' :
+                rental.status === 'completed' ? '已完成' : '已取消';
+
+            detailContent.innerHTML = `
+                <div style="background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; margin-bottom: 20px; color: #333;">预约详情</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; color: #666;">相机信息</h4>
+                        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+                            <p style="margin: 8px 0;"><strong>相机名称：</strong>${rental.camera_name}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; color: #666;">用户信息</h4>
+                        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+                            <p style="margin: 8px 0;"><strong>姓名：</strong>${rental.user_name}</p>
+                            <p style="margin: 8px 0;"><strong>电话：</strong>${rental.user_phone}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; color: #666;">预约信息</h4>
+                        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
+                            <p style="margin: 8px 0;"><strong>开始日期：</strong>${rental.start_date}</p>
+                            <p style="margin: 8px 0;"><strong>结束日期：</strong>${rental.end_date}</p>
+                            <p style="margin: 8px 0;"><strong>总价格：</strong>¥${rental.total_price.toFixed(2)}</p>
+                            <p style="margin: 8px 0;"><strong>状态：</strong><span class="rental-status ${statusClass}">${statusText}</span></p>
+                            <p style="margin: 8px 0;"><strong>创建时间：</strong>${rental.created_at}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px; color: #666;">操作</h4>
+                        <div style="display: flex; gap: 10px;">
+                            ${rental.status === 'active' ? `
+                                <button class="btn btn-primary" onclick="editRental(${rental.id})">修改预约</button>
+                                <button class="btn btn-primary" onclick="renewRental(${rental.id})">续约</button>
+                                <button class="btn btn-secondary" onclick="cancelRental(${rental.id})">取消预约</button>
+                            ` : `
+                                <button class="btn btn-primary" onclick="editRental(${rental.id})">修改预约</button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 编辑预约
+        function editRental(rentalId) {
+            const rental = rentals.find(r => r.id === rentalId);
+            if (!rental) return;
+
+            document.getElementById('edit-rental-id').value = rental.id;
+            document.getElementById('edit-camera-name').value = rental.camera_name;
+            document.getElementById('edit-user-name').value = rental.user_name;
+            document.getElementById('edit-user-phone').value = rental.user_phone;
+            document.getElementById('edit-start-date').value = rental.start_date;
+            document.getElementById('edit-end-date').value = rental.end_date;
+            document.getElementById('edit-status').value = rental.status;
+
+            document.getElementById('rental-edit-modal').style.display = 'flex';
+        }
+
+        // 保存预约修改
+        function saveRentalChanges() {
+            const rentalId = parseInt(document.getElementById('edit-rental-id').value);
+            const userName = document.getElementById('edit-user-name').value;
+            const userPhone = document.getElementById('edit-user-phone').value;
+            const startDate = document.getElementById('edit-start-date').value;
+            const endDate = document.getElementById('edit-end-date').value;
+            const status = document.getElementById('edit-status').value;
+
+            showNotification('正在保存修改...', 'info');
+
+            // 发送API请求
+            fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userName, userPhone, startDate, endDate, status })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 关闭模态框
+                        closeModal('rental-edit-modal');
+
+                        // 重新加载预约列表
+                        loadRentals();
+
+                        // 如果当前正在查看的是被修改的预约，重新加载详情
+                        if (currentRental && currentRental.id === rentalId) {
+                            const updatedRental = data.data;
+                            viewRentalDetail(updatedRental);
+                        }
+
+                        showNotification('预约信息已更新', 'success');
+
+                        // 发送WebSocket通知
+                        if (socket) {
+                            socket.emit('rental:update', {
+                                id: rentalId,
+                                status: status,
+                                message: '预约信息已更新'
+                            });
+                        }
+                    } else {
+                        showNotification('保存失败：' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('网络错误，请稍后重试', 'error');
+                    console.error('保存预约修改失败:', error);
+                });
+        }
+
+        // 续约预约
+        function renewRental(rentalId) {
+            document.getElementById('renew-rental-id').value = rentalId;
+            document.getElementById('renew-days').value = 1;
+            document.getElementById('renew-notes').value = '';
+            document.getElementById('rental-renew-modal').style.display = 'flex';
+        }
+
+        // 确认续约
+        function confirmRenewal() {
+            const rentalId = parseInt(document.getElementById('renew-rental-id').value);
+            const days = parseInt(document.getElementById('renew-days').value);
+
+            if (!days || days <= 0) {
+                showNotification('请输入有效的续约天数', 'error');
+                return;
+            }
+
+            showNotification('正在处理续约...', 'info');
+
+            // 发送API请求
+            fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}/renew`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ days })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 关闭模态框
+                        closeModal('rental-renew-modal');
+
+                        // 重新加载预约列表
+                        loadRentals();
+
+                        // 如果当前正在查看的是被续约的预约，重新加载详情
+                        if (currentRental && currentRental.id === rentalId) {
+                            const updatedRental = data.data;
+                            viewRentalDetail(updatedRental);
+                        }
+
+                        showNotification(`预约已续约 ${days} 天`, 'success');
+
+                        // 发送WebSocket通知
+                        if (socket) {
+                            socket.emit('rental:update', {
+                                id: rentalId,
+                                status: 'active',
+                                message: `预约已续约 ${days} 天`
+                            });
+                        }
+                    } else {
+                        showNotification('续约失败：' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('网络错误，请稍后重试', 'error');
+                    console.error('续约预约失败:', error);
+                });
+        }
+
+        // 取消预约
+        function cancelRental(rentalId) {
+            if (confirm('确定要取消这个预约吗？')) {
+                showNotification('正在处理取消预约...', 'info');
+
+                // 发送API请求
+                fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 重新加载预约列表
+                            loadRentals();
+
+                            // 如果当前正在查看的是被取消的预约，清除详情
+                            if (currentRental && currentRental.id === rentalId) {
+                                const detailContent = document.getElementById('rental-detail-content');
+                                detailContent.innerHTML = `
+                                <div class="empty-state">
+                                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=calendar%20booking%20icon%20with%20empty%20state%2C%20minimal%20design%2C%20blue%20color%20scheme&image_size=square_hd"
+                                        alt="">
+                                    <h3>预约已取消</h3>
+                                    <p>该预约已被取消</p>
+                                </div>
+                            `;
+                            }
+
+                            showNotification('预约已取消', 'success');
+
+                            // 发送WebSocket通知
+                            if (socket) {
+                                socket.emit('rental:update', {
+                                    id: rentalId,
+                                    status: 'cancelled',
+                                    message: '预约已取消'
+                                });
+                            }
+                        } else {
+                            showNotification('取消失败：' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('网络错误，请稍后重试', 'error');
+                        console.error('取消预约失败:', error);
+                    });
+            }
+        }
+
+        // 刷新预约列表
+        function refreshRentals() {
+            showNotification('正在刷新预约列表...', 'info');
+            loadRentals();
+            showNotification('预约列表已刷新', 'success');
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminName');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // 辅助函数
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) {
+                return '刚刚';
+            } else if (diff < 3600000) {
+                return `${Math.floor(diff / 60000)}分钟前`;
+            } else if (diff < 86400000) {
+                return `${Math.floor(diff / 3600000)}小时前`;
+            } else {
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 页面加载完成后初始化
+        window.onload = init;
+    </script>
+</body>
+
+</html>
