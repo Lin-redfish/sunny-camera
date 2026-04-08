@@ -1,14 +1,32 @@
-# Windows
-[Dd]esktop.ini
-Thumbs.db
-$RECYCLE.BIN/
-
-# macOS
-.DS_Store
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-
-# Node.js
+# 依赖包
 node_modules/
+
+# 环境变量文件
+.env
+
+# 日志文件
+*.log
+*.err
+
+# 临时文件
+*.tmp
+*.temp
+
+# IDE 相关文件
+.idea/
+.vscode/
+.trae/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 构建产物
+build/
+dist/
+
+# 测试文件
+coverage/
+
+# 其他临时文件
+query

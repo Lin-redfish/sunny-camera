@@ -1342,7 +1342,7 @@
             showNotification('正在加载预约列表...', 'info');
 
             // 从真实API获取数据
-            fetch('https://naples-dressing-toolbox-movers.trycloudflare.com/api/admin/rentals')
+            fetch('https://sunnycamera.online/api/admin/rentals')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1357,47 +1357,6 @@
                 .catch(error => {
                     showNotification('网络错误，请稍后重试', 'error');
                     console.error('加载预约列表网络错误:', error);
-
-                    // 使用模拟数据作为 fallback
-                    rentals = [
-                        {
-                            id: 1,
-                            camera_id: 1,
-                            camera_name: 'Canon EOS R5',
-                            user_name: '张三',
-                            user_phone: '13800138000',
-                            start_date: '2026-01-26',
-                            end_date: '2026-01-28',
-                            total_price: 900.00,
-                            status: 'active',
-                            created_at: '2026-01-25 10:00:00'
-                        },
-                        {
-                            id: 2,
-                            camera_id: 2,
-                            camera_name: 'Sony A7 IV',
-                            user_name: '李四',
-                            user_phone: '13900139000',
-                            start_date: '2026-01-27',
-                            end_date: '2026-01-30',
-                            total_price: 1000.00,
-                            status: 'active',
-                            created_at: '2026-01-25 11:00:00'
-                        },
-                        {
-                            id: 3,
-                            camera_id: 3,
-                            camera_name: 'Nikon Z6 II',
-                            user_name: '王五',
-                            user_phone: '13700137000',
-                            start_date: '2026-01-25',
-                            end_date: '2026-01-26',
-                            total_price: 400.00,
-                            status: 'completed',
-                            created_at: '2026-01-24 15:00:00'
-                        }
-                    ];
-                    renderRentalList();
                 });
         }
 
@@ -1436,7 +1395,7 @@
                         <p>用户：${rental.user_name}</p>
                         <p>电话：${rental.user_phone}</p>
                         <p>时间：${rental.start_date} 至 ${rental.end_date}</p>
-                        <p>价格：¥${rental.total_price.toFixed(2)}</p>
+                        <p>价格：¥${parseFloat(rental.total_price).toFixed(2)}</p>
                     </div>
                     <div class="rental-actions">
                         ${rental.status === 'active' ? `
@@ -1488,7 +1447,7 @@
                         <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px;">
                             <p style="margin: 8px 0;"><strong>开始日期：</strong>${rental.start_date}</p>
                             <p style="margin: 8px 0;"><strong>结束日期：</strong>${rental.end_date}</p>
-                            <p style="margin: 8px 0;"><strong>总价格：</strong>¥${rental.total_price.toFixed(2)}</p>
+                            <p style="margin: 8px 0;"><strong>总价格：</strong>¥${parseFloat(rental.total_price).toFixed(2)}</p>
                             <p style="margin: 8px 0;"><strong>状态：</strong><span class="rental-status ${statusClass}">${statusText}</span></p>
                             <p style="margin: 8px 0;"><strong>创建时间：</strong>${rental.created_at}</p>
                         </div>
@@ -1538,7 +1497,7 @@
             showNotification('正在保存修改...', 'info');
 
             // 发送API请求
-            fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}`, {
+            fetch(`https://sunnycamera.online/api/rentals/${rentalId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1601,7 +1560,7 @@
             showNotification('正在处理续约...', 'info');
 
             // 发送API请求
-            fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}/renew`, {
+            fetch(`https://sunnycamera.online/api/rentals/${rentalId}/renew`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1649,7 +1608,7 @@
                 showNotification('正在处理取消预约...', 'info');
 
                 // 发送API请求
-                fetch(`https://naples-dressing-toolbox-movers.trycloudflare.com/api/rentals/${rentalId}/cancel`, {
+                fetch(`https://sunnycamera.online/api/rentals/${rentalId}/cancel`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

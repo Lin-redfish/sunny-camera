@@ -23,7 +23,7 @@ Page({
     });
   },
 
-  async login() {
+  login() {
     const { nickname, avatar, openid } = this.data;
 
     if (!openid) {
@@ -38,58 +38,53 @@ Page({
       title: '登录中...'
     });
 
-    try {
-      // 调用登录API
-      const response = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'https://sunnycamera.online/api/user/login',
-          method: 'POST',
-          header: {
-            'Content-Type': 'application/json'
-          },
-          data: {
-            openid,
-            nickname,
-            avatar
-          },
-          success: (res) => resolve(res),
-          fail: (err) => reject(err)
-        });
-      });
+    // 调用登录API
+    wx.request({
+      url: 'http://localhost:3001/api/user/login',
+      method: 'POST',
+      header: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        openid,
+        nickname,
+        avatar
+      },
+      success: (res) => {
+        wx.hideLoading();
+        const data = res.data;
+        if (data && data.success) {
+          // 保存登录状态
+          wx.setStorageSync('userInfo', data.data.user);
+          wx.setStorageSync('sessionKey', data.data.sessionKey);
+          wx.setStorageSync('expiresAt', data.data.expiresAt);
 
-      const data = response.data;
-
-      if (data && data.success) {
-        // 保存登录状态
-        wx.setStorageSync('userInfo', data.data.user);
-        wx.setStorageSync('sessionKey', data.data.sessionKey);
-        wx.setStorageSync('expiresAt', data.data.expiresAt);
-
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success'
-        });
-
-        // 跳转到首页
-        setTimeout(() => {
-          wx.switchTab({
-            url: '../index/index'
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success'
           });
-        }, 1500);
-      } else {
+
+          // 跳转到首页
+          setTimeout(() => {
+            wx.switchTab({
+              url: '../index/index'
+            });
+          }, 1500);
+        } else {
+          wx.showToast({
+            title: (data && data.message) || '登录失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (error) => {
+        wx.hideLoading();
+        console.error('登录失败:', error);
         wx.showToast({
-          title: (data && data.message) || '登录失败',
+          title: '登录失败，请检查网络连接',
           icon: 'none'
         });
       }
-    } catch (error) {
-      console.error('登录失败:', error);
-      wx.showToast({
-        title: '登录失败，请检查网络连接',
-        icon: 'none'
-      });
-    } finally {
-      wx.hideLoading();
-    }
+    });
   }
 });

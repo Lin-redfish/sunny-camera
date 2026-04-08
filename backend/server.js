@@ -17,12 +17,14 @@ const io = new Server(server, {
     credentials: true
   }
 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// 同时提供根目录和 miniprogram 目录的静态文件
+app.use(express.static(path.join(__dirname, '..')));
 app.use(express.static(path.join(__dirname, '../miniprogram')));
 
 app.use('/api', apiRoutes);

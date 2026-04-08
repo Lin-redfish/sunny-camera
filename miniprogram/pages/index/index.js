@@ -6,10 +6,8 @@ Page({
 
   onLoad() {
     this.checkLoginStatus();
-    // 使用 Promise 处理异步函数
-    this.loadCameras().catch(err => {
-      console.error('加载相机失败:', err);
-    });
+    // 直接调用异步函数，不使用 Promise 链
+    this.loadCameras();
   },
 
   checkLoginStatus() {
@@ -26,47 +24,42 @@ Page({
     }
   },
 
-  async loadCameras() {
+  loadCameras() {
     wx.showLoading({
       title: '加载中...'
     });
 
-    try {
-      // 调用相机列表API
-      const response = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'https://sunnycamera.online/api/cameras',
-          method: 'GET',
-          data: {
-            status: 'available'
-          },
-          success: (res) => resolve(res),
-          fail: (err) => reject(err)
-        });
-      });
+    // 调用相机列表API
+    wx.request({
+      url: 'http://localhost:3001/api/cameras',
+      method: 'GET',
+      data: {
+        status: 'available'
+      },
+      success: (res) => {
+        wx.hideLoading();
+        const data = res.data;
+        if (data && data.success) {
+          // 为相机添加默认图片
+          const cameras = data.data.map(camera => ({
+            ...camera,
+            image: camera.image_url || '/images/default-camera.jpg'
+          }));
 
-      const data = response.data;
-
-      if (data && data.success) {
-        // 为相机添加默认图片
-        const cameras = data.data.map(camera => ({
-          ...camera,
-          image: camera.image_url || '/images/default-camera.jpg'
-        }));
-
-        this.setData({
-          cameras
+          this.setData({
+            cameras
+          });
+        }
+      },
+      fail: (error) => {
+        wx.hideLoading();
+        console.error('获取相机列表失败:', error);
+        wx.showToast({
+          title: '获取相机列表失败',
+          icon: 'none'
         });
       }
-    } catch (error) {
-      console.error('获取相机列表失败:', error);
-      wx.showToast({
-        title: '获取相机列表失败',
-        icon: 'none'
-      });
-    } finally {
-      wx.hideLoading();
-    }
+    });
   },
 
   gotoDetail(e) {
