@@ -1,0 +1,50 @@
+<view class="container">
+  <view class="header">
+    <text class="title">用户协议</text>
+  </view>
+  
+  <view class="content">
+    <text class="section-title">1. 协议的接受</text>
+    <text class="section-content">
+      欢迎使用相机预约系统。通过使用本系统，您同意遵守本用户协议的所有条款和条件。如果您不同意本协议的任何部分，请不要使用本系统。
+    </text>
+    
+    <text class="section-title">2. 服务内容</text>
+    <text class="section-content">
+      本系统提供相机租赁预约服务，包括但不限于相机浏览、预约、在线客服等功能。
+    </text>
+    
+    <text class="section-title">3. 用户账户</text>
+    <text class="section-content">
+      您需要通过微信登录才能使用本系统的部分功能。您应妥善保管您的微信账号信息，对使用您账号的所有行为负责。
+    </text>
+    
+    <text class="section-title">4. 用户义务</text>
+    <text class="section-content">
+      - 您应提供真实、准确的个人信息
+      - 您应遵守国家法律法规和社会公德
+      - 您不应利用本系统进行任何违法活动
+      - 您不应侵犯他人的合法权益
+    </text>
+    
+    <text class="section-title">5. 服务变更</text>
+    <text class="section-content">
+      我们有权随时变更、暂停或终止部分或全部服务，无需事先通知您。
+    </text>
+    
+    <text class="section-title">6. 免责声明</text>
+    <text class="section-content">
+      我们不对因使用本系统而产生的任何直接或间接损失负责。
+    </text>
+    
+    <text class="section-title">7. 协议修改</text>
+    <text class="section-content">
+      我们有权随时修改本协议，修改后的协议将在系统中公布。
+    </text>
+    
+    <text class="section-title">8. 法律适用</text>
+    <text class="section-content">
+      本协议的订立、执行、解释及争议的解决均适用中华人民共和国法律。
+    </text>
+  </view>
+</view>

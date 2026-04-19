@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">相机评价</text>
+  </view>
+  
+  <view class="review-form">
+    <view class="form-group">
+      <text class="label">评价星级</text>
+      <view class="star-rating">
+        <block wx:for="[1, 2, 3, 4, 5]" wx:key="index">
+          <text class="star {{star >= item ? 'active' : ''}}" bindtap="setStar" data-star="{{item}}">{{item}}</text>
+        </block>
+      </view>
+    </view>
+    
+    <view class="form-group">
+      <text class="label">评价内容</text>
+      <textarea placeholder="请输入您的评价..." bindinput="bindContentInput"></textarea>
+    </view>
+    
+    <button class="submit-btn" bindtap="submitReview">提交评价</button>
+  </view>
+</view>

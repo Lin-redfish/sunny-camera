@@ -2,42 +2,42 @@ const pool = require('./config/database');
 
 // SQL 语句
 const createTables = `
--- 会话表
-CREATE TABLE IF NOT EXISTS conversations (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id VARCHAR(100) NOT NULL COMMENT '用户ID',
-  user_name VARCHAR(100) COMMENT '用户昵称',
-  user_avatar VARCHAR(255) COMMENT '用户头像',
-  last_message TEXT COMMENT '最后一条消息',
-  last_message_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后消息时间',
-  unread_count INT DEFAULT 0 COMMENT '未读消息数',
-  status ENUM('active', 'closed') DEFAULT 'active' COMMENT '会话状态',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-);
+-- 用户表
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    openid VARCHAR(100) NOT NULL UNIQUE COMMENT '微信openid',
+    nickname VARCHAR(100) COMMENT '用户昵称',
+    avatar VARCHAR(255) COMMENT '用户头像',
+    phone VARCHAR(20) COMMENT '用户电话',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_openid (openid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
--- 消息表
-CREATE TABLE IF NOT EXISTS messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  conversation_id INT NOT NULL COMMENT '会话ID',
-  sender_type ENUM('user', 'admin') NOT NULL COMMENT '发送者类型',
-  sender_name VARCHAR(100) COMMENT '发送者名称',
-  sender_avatar VARCHAR(255) COMMENT '发送者头像',
-  content TEXT NOT NULL COMMENT '消息内容',
-  message_type ENUM('text', 'image', 'file') DEFAULT 'text' COMMENT '消息类型',
-  is_read BOOLEAN DEFAULT FALSE COMMENT '是否已读',
-  read_time DATETIME COMMENT '已读时间',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
-);
+-- 用户会话表
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_key VARCHAR(100) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_session_key (session_key),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户会话表';
 
--- 添加外键约束
-ALTER TABLE messages ADD FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE;
-
--- 创建索引
-CREATE INDEX idx_conversations_user_id ON conversations(user_id);
-CREATE INDEX idx_conversations_status ON conversations(status);
-CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
-CREATE INDEX idx_messages_is_read ON messages(is_read);
+-- 评价表
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    rental_id INT NOT NULL,
+    star INT NOT NULL COMMENT '评分（1-5）',
+    content TEXT NOT NULL COMMENT '评价内容',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE,
+    INDEX idx_rental_id (rental_id),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价表';
 `;
 
 // 执行 SQL 语句

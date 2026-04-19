@@ -94,3 +94,40 @@ CREATE TABLE IF NOT EXISTS messages (
 -- 插入默认管理员数据（密码：admin123）
 INSERT INTO admins (username, password, name, status) VALUES
 ('admin', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', '管理员', 'active');
+
+-- 用户表
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    openid VARCHAR(100) NOT NULL UNIQUE COMMENT '微信openid',
+    nickname VARCHAR(100) COMMENT '用户昵称',
+    avatar VARCHAR(255) COMMENT '用户头像',
+    phone VARCHAR(20) COMMENT '用户电话',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_openid (openid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+-- 用户会话表
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_key VARCHAR(100) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_session_key (session_key),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户会话表';
+
+-- 评价表
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    rental_id INT NOT NULL,
+    star INT NOT NULL COMMENT '评分（1-5）',
+    content TEXT NOT NULL COMMENT '评价内容',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE,
+    INDEX idx_rental_id (rental_id),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价表';

@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="header">
+    <text class="title">相机预约</text>
+  </view>
+  
+  <view class="camera-list">
+    <block wx:for="{{cameras}}" wx:key="id">
+      <view class="camera-item" bindtap="gotoBooking" data-id="{{item.id}}">
+        <image src="{{item.image}}" mode="aspectFit"></image>
+        <view class="camera-info">
+          <text class="camera-name">{{item.name}}</text>
+          <text class="camera-brand">{{item.brand}} {{item.model}}</text>
+          <text class="camera-price">¥{{item.price}}/天</text>
+          <text class="camera-status">可预约</text>
+        </view>
+        <view class="arrow">→</view>
+      </view>
+    </block>
+  </view>
+</view>

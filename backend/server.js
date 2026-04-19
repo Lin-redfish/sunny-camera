@@ -7,6 +7,7 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 
 const apiRoutes = require('./routes/api');
+const checkExpiredRentals = require('./check-expired-rentals');
 
 const app = express();
 const server = http.createServer(app);
@@ -169,4 +170,11 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
   console.log(`局域网访问地址: http://0.0.0.0:${PORT}`);
   console.log(`WebSocket服务已启动`);
+  
+  // 启动定期检查到期租赁记录的任务
+  setInterval(checkExpiredRentals, 5 * 60 * 1000); // 每5分钟检查一次
+  console.log(`定期检查到期租赁记录任务已启动 (每5分钟)`);
+  
+  // 启动时立即执行一次检查
+  checkExpiredRentals();
 });

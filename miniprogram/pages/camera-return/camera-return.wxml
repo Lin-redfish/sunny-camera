@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="header">
+    <text class="title">相机归还</text>
+  </view>
+  
+  <view class="rental-list">
+    <block wx:for="{{rentals}}" wx:key="id">
+      <view class="rental-item" wx:if="{{item.status === 'active'}}">
+        <view class="rental-info">
+          <text class="camera-name">{{item.camera_name}}</text>
+          <text class="rental-date">预约时间: {{item.start_date}} 至 {{item.end_date}}</text>
+          <text class="rental-price">总费用: ¥{{item.total_price}}</text>
+          <text class="rental-status" wx:if="{{isOverdue(item.end_date)}}">已逾期</text>
+          <text class="rental-status normal" wx:else>可归还</text>
+        </view>
+        <button class="return-btn" bindtap="returnCamera" data-id="{{item.id}}" wx:if="{{!isOverdue(item.end_date)}}">
+          归还相机
+        </button>
+        <button class="return-btn disabled" wx:else disabled>
+          已逾期
+        </button>
+      </view>
+    </block>
+    <view class="empty" wx:if="{{rentals.length === 0 || !hasActiveRentals}}">
+      <text>暂无待归还的相机</text>
+    </view>
+  </view>
+</view>

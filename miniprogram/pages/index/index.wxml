@@ -7,6 +7,26 @@
     <button class="logout-btn" bindtap="logout">退出登录</button>
   </view>
   
+  <!-- 功能入口模块 -->
+  <view class="function-entrances">
+    <view class="entrance-item" bindtap="gotoCameraPreview">
+      <image src="../../images/camera.png" mode="aspectFit"></image>
+      <text>相机预览</text>
+    </view>
+    <view class="entrance-item" bindtap="gotoCameraBooking">
+      <image src="../../images/booking.png" mode="aspectFit"></image>
+      <text>相机预约</text>
+    </view>
+    <view class="entrance-item" bindtap="gotoCameraReviews">
+      <image src="../../images/reviews.png" mode="aspectFit"></image>
+      <text>相机归还</text>
+    </view>
+    <view class="entrance-item" bindtap="gotoCustomerService">
+      <image src="../../images/service.png" mode="aspectFit"></image>
+      <text>客服交流</text>
+    </view>
+  </view>
+  
   <view class="camera-list">
     <view class="section-title">
       <text>可预约相机</text>

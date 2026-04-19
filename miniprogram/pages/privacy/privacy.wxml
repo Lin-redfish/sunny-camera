@@ -1,0 +1,60 @@
+<view class="container">
+  <view class="header">
+    <text class="title">隐私政策</text>
+  </view>
+  
+  <view class="content">
+    <text class="section-title">1. 隐私政策的适用范围</text>
+    <text class="section-content">
+      本隐私政策适用于相机预约系统收集、使用、存储和披露您的个人信息的行为。
+    </text>
+    
+    <text class="section-title">2. 收集的信息</text>
+    <text class="section-content">
+      我们可能收集以下信息：
+      - 您的微信昵称、头像等基本信息
+      - 您的联系电话（如果您提供）
+      - 您的预约记录和使用行为
+    </text>
+    
+    <text class="section-title">3. 信息的使用</text>
+    <text class="section-content">
+      我们使用收集的信息：
+      - 为您提供相机预约服务
+      - 改善我们的服务质量
+      - 与您沟通相关事宜
+      - 遵守法律法规要求
+    </text>
+    
+    <text class="section-title">4. 信息的披露</text>
+    <text class="section-content">
+      我们不会向第三方披露您的个人信息，除非：
+      - 获得您的明确许可
+      - 遵守法律法规要求
+      - 保护我们的合法权益
+    </text>
+    
+    <text class="section-title">5. 信息的存储</text>
+    <text class="section-content">
+      我们将在法律要求的期限内存储您的个人信息，或为实现本政策所述目的所必需的时间内存储您的个人信息。
+    </text>
+    
+    <text class="section-title">6. 信息的安全</text>
+    <text class="section-content">
+      我们采取合理的安全措施保护您的个人信息，防止未经授权的访问、使用或披露。
+    </text>
+    
+    <text class="section-title">7. 您的权利</text>
+    <text class="section-content">
+      您有权：
+      - 访问和修改您的个人信息
+      - 要求删除您的个人信息
+      - 限制我们对您个人信息的处理
+    </text>
+    
+    <text class="section-title">8. 隐私政策的修改</text>
+    <text class="section-content">
+      我们有权随时修改本隐私政策，修改后的政策将在系统中公布。
+    </text>
+  </view>
+</view>

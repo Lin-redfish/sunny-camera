@@ -3,7 +3,14 @@
     "pages/index/index",
     "pages/login/login",
     "pages/detail/detail",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/camera-preview/camera-preview",
+    "pages/camera-booking/camera-booking",
+    "pages/camera-return/camera-return",
+    "pages/camera-review/camera-review",
+    "pages/customer-service/customer-service",
+    "pages/agreement/agreement",
+    "pages/privacy/privacy"
   ],
   "lazyCodeLoading": "requiredComponents",
   "window": {

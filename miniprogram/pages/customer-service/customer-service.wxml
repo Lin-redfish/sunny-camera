@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">客服交流</text>
+  </view>
+  
+  <view class="chat-container">
+    <scroll-view class="message-list" scroll-y="true" id="messageList">
+      <block wx:for="{{messages}}" wx:key="id">
+        <view class="message-item {{item.sender_type === 'user' ? 'user' : 'admin'}}">
+          <view class="message-content">
+            <text>{{item.content}}</text>
+          </view>
+          <text class="message-time">{{formatTime(item.created_at)}}</text>
+        </view>
+      </block>
+    </scroll-view>
+    
+    <view class="input-area">
+      <input type="text" placeholder="请输入消息..." bindinput="bindMessageInput" value="{{inputMessage}}"></input>
+      <button class="send-btn" bindtap="sendMessage">发送</button>
+    </view>
+  </view>
+</view>

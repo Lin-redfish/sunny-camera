@@ -31,7 +31,7 @@ Page({
 
     // 调用相机列表API
     wx.request({
-      url: 'http://localhost:3001/api/cameras',
+      url: 'https://sunnycamera.online/api/cameras',
       method: 'GET',
       data: {
         status: 'available'
@@ -66,6 +66,35 @@ Page({
     const cameraId = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `../detail/detail?id=${cameraId}`
+    });
+  },
+
+  // 功能入口点击事件
+  gotoCameraPreview() {
+    // 相机预览功能，跳转到相机列表页面
+    wx.navigateTo({
+      url: '../camera-preview/camera-preview'
+    });
+  },
+
+  gotoCameraBooking() {
+    // 相机预约功能，跳转到相机列表页面
+    wx.navigateTo({
+      url: '../camera-booking/camera-booking'
+    });
+  },
+
+  gotoCameraReviews() {
+    // 相机归还功能，跳转到归还页面
+    wx.navigateTo({
+      url: '../camera-return/camera-return'
+    });
+  },
+
+  gotoCustomerService() {
+    // 客服交流功能，跳转到客服页面
+    wx.navigateTo({
+      url: '../customer-service/customer-service'
     });
   },
 

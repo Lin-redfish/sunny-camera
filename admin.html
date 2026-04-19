@@ -883,7 +883,7 @@
 
         // 初始化WebSocket
         function initSocket() {
-            socket = io('https://sunnycamera.online', {
+            socket = io('http://localhost:3001', {
                 transports: ['websocket'],
                 reconnection: true
             });
@@ -951,7 +951,7 @@
 
             try {
                 // 从真实API获取数据
-                const response = await fetch('https://sunnycamera.online/api/conversations');
+                const response = await fetch('http://localhost:3001/api/conversations');
                 const data = await response.json();
 
                 if (data.success) {
@@ -1104,7 +1104,7 @@
 
             try {
                 // 从真实API获取数据
-                const response = await fetch(`https://sunnycamera.online/api/conversations/${currentConversation.id}/messages`);
+                const response = await fetch(`http://localhost:3001/api/conversations/${currentConversation.id}/messages`);
                 const data = await response.json();
 
                 if (data.success) {
@@ -1233,7 +1233,7 @@
             showNotification('正在发送消息...', 'info');
 
             // 发送API请求
-            fetch('https://sunnycamera.online/api/messages', {
+            fetch('http://localhost:3001/api/messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1281,7 +1281,7 @@
                 showNotification('正在关闭会话...', 'info');
 
                 // 发送API请求
-                fetch(`https://sunnycamera.online/api/conversations/${currentConversation.id}/close`, {
+                fetch(`http://localhost:3001/api/conversations/${currentConversation.id}/close`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1342,7 +1342,7 @@
             showNotification('正在加载预约列表...', 'info');
 
             // 从真实API获取数据
-            fetch('https://sunnycamera.online/api/admin/rentals')
+            fetch('http://localhost:3001/api/admin/rentals')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

@@ -935,4 +935,83 @@ router.put('/user/me', async (req, res) => {
   }
 });
 
+// 评价相关API
+
+// 提交评价
+router.post('/reviews', async (req, res) => {
+  try {
+    const { rentalId, star, content } = req.body;
+
+    if (!rentalId || !star || !content) {
+      return res.status(400).json({
+        success: false,
+        message: '缺少必要参数'
+      });
+    }
+
+    // 检查租赁记录是否存在
+    const [rentalRows] = await pool.execute(
+      'SELECT * FROM rentals WHERE id = ?',
+      [rentalId]
+    );
+
+    if (rentalRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '租赁记录不存在'
+      });
+    }
+
+    // 插入评价记录
+    const [result] = await pool.execute(
+      'INSERT INTO reviews (rental_id, star, content, created_at) VALUES (?, ?, ?, ?)',
+      [rentalId, star, content, new Date()]
+    );
+
+    res.json({
+      success: true,
+      message: '评价成功',
+      data: {
+        reviewId: result.insertId
+      }
+    });
+  } catch (error) {
+    console.error('提交评价失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '提交评价失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取评价列表
+router.get('/reviews', async (req, res) => {
+  try {
+    const { rentalId } = req.query;
+    let query = 'SELECT * FROM reviews WHERE 1=1';
+    const params = [];
+
+    if (rentalId) {
+      query += ' AND rental_id = ?';
+      params.push(rentalId);
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    const [rows] = await pool.execute(query, params);
+    res.json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    console.error('获取评价列表失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '获取评价列表失败',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

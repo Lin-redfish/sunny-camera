@@ -20,7 +20,7 @@ Page({
 
     // 调用相机详情API
     wx.request({
-      url: `http://localhost:3001/api/cameras/${cameraId}`,
+      url: `https://sunnycamera.online/api/cameras/${cameraId}`,
       method: 'GET',
       success: (res) => {
         wx.hideLoading();
@@ -105,7 +105,7 @@ Page({
 
     // 调用预约API
     wx.request({
-      url: 'http://localhost:3001/api/rent',
+      url: 'https://sunnycamera.online/api/rent',
       method: 'POST',
       header: {
         'Content-Type': 'application/json'

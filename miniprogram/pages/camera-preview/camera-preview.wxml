@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="header">
+    <text class="title">相机预览</text>
+  </view>
+  
+  <view class="camera-list">
+    <block wx:for="{{cameras}}" wx:key="id">
+      <view class="camera-item" bindtap="gotoDetail" data-id="{{item.id}}">
+        <image src="{{item.image}}" mode="aspectFit"></image>
+        <view class="camera-info">
+          <text class="camera-name">{{item.name}}</text>
+          <text class="camera-brand">{{item.brand}} {{item.model}}</text>
+          <text class="camera-price">¥{{item.price}}/天</text>
+          <text class="camera-status" wx:if="{{item.status === 'available'}}">可预约</text>
+          <text class="camera-status rented" wx:else>{{item.status === 'rented' ? '已租用' : '维护中'}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

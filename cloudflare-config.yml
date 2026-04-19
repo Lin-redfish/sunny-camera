@@ -1,0 +1,6 @@
+tunnel: 94f5dc9c-18ba-44ec-9af3-54a9bafcf8b7
+credentials-file: C:\Users\HUAWEI\.cloudflared\94f5dc9c-18ba-44ec-9af3-54a9bafcf8b7.json
+ingress:
+  - hostname: sunnycamera.online
+    service: http://127.0.0.1:3001
+  - service: http_status:404
